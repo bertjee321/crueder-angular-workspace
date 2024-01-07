@@ -1,121 +1,76 @@
-
+import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { MonthCalendarGrid } from './models/month-calendar-grid.model';
+import {
+  getExactDate,
+  getFirstWeekDayString,
+  getMonthString,
+  getNumberOfDaysInMonth,
+} from './utils/date.utils';
+
+const DAYS_OF_WEEK = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+];
 
 @Component({
   selector: 'ngx-calendar-io',
   standalone: true, // TO DO: figure out what this means :)
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './ngx-calendar-io.component.html',
   styleUrls: ['./ngx-calendar-io.component.css'],
 })
 export class NgxCalendarIoComponent implements OnInit {
-  @Input() date!: Date;
+  @Input() date: Date = new Date(2024, 1);
   @Input() locale: string = 'en';
-  private month?: string;
-  private firstWeekDay?: string;
 
-  private DAYS_OF_WEEK = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
+  protected get monthName(): string {
+    return getMonthString(this.date, this.locale);
+  }
 
-  protected grid: MonthCalendarGrid[] = Array.from({ length: 5 }, () => ({
-    monday: {
-      date: undefined,
-      events: [],
-    },
-    tuesday: {
-      date: undefined,
-      events: [],
-    },
-    wednesday: {
-      date: undefined,
-      events: [],
-    },
-    thursday: {
-      date: undefined,
-      events: [],
-    },
-    friday: {
-      date: undefined,
-      events: [],
-    },
-    saturday: {
-      date: undefined,
-      events: [],
-    },
-    sunday: {
-      date: undefined,
-      events: [],
-    },
-  }));
+  protected grid: MonthCalendarGrid[] = Array.from({ length: 5 }, () => {
+    const week: MonthCalendarGrid = {};
+    DAYS_OF_WEEK.forEach((day) => {
+      week[day] = {
+        date: undefined,
+        events: [],
+      };
+    });
+    return week;
+  });
 
   ngOnInit(): void {
-    this.month = this.getMonthString(this.date);
-    this.firstWeekDay = this.getFirstWeekDayString(this.date);
+    this.setGridDates();
   }
 
-  // utils
-  private getMonthString(date: Date): string {
-    return date.toLocaleString(this.locale, { month: 'long' });
-  }
-
-  // utils
-  private getFirstWeekDayString(date: Date): string {
-    const monthName = this.getMonthString(date);
-    const year = date.getFullYear().toString();
-
-    return new Date(`${monthName} 1, ${year}`).toLocaleString(this.locale, {
-      weekday: 'long',
-    });
-  }
-
-  // utils
-  private getNumberOfDaysInMonth(date: Date): number {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-
-    const lastDay = new Date(year, month, 0);
-    const daysInMonth = lastDay.getDate();
-
-    return daysInMonth;
-  }
-
-  // component function (stays here)
   private setGridDates() {
-    const month = this.getMonthString(this.date);
-    const firstWeekDay = this.getFirstWeekDayString(this.date);
-    const numberOfDaysMonth = this.getNumberOfDaysInMonth(this.date);
+    const firstWeekDay = getFirstWeekDayString(this.date, this.locale);
+    const numberOfDaysMonth = getNumberOfDaysInMonth(this.date);
 
     let firstDayIsSet = false;
     let currentDayToSet = 1;
-    let currentDateToSet = new Date(`${month}-${currentDayToSet}`);
 
-    for (let week in this.grid) {
-      Object.entries(this.grid[+week]).forEach(([key]) => {
+    for (let weekIndex = 0; weekIndex < this.grid.length; weekIndex++) {
+      const currentWeek = this.grid[weekIndex];
+
+      for (const [day, cell] of Object.entries(currentWeek)) {
         if (currentDayToSet > numberOfDaysMonth) {
-          return;
+          break;
         }
 
-        if (firstDayIsSet) {
-          this.grid[+week][key].date = currentDateToSet;
-          currentDayToSet += 1;
-          currentDateToSet = new Date(`${month}-${currentDayToSet}`);
-        } else {
-          if (key === firstWeekDay.toLowerCase()) {
-            this.grid[+week][key].date = currentDateToSet;
-            currentDayToSet += 1;
-            currentDateToSet = new Date(`${month}-${currentDayToSet}`);
-            firstDayIsSet = true;
-          }
+        const currentDateToSet = getExactDate(currentDayToSet, this.date);
+
+        if (firstDayIsSet || day === firstWeekDay.toLowerCase()) {
+          cell.date = currentDateToSet;
+          currentDayToSet++;
+          firstDayIsSet = true;
         }
-      });
+      }
     }
   }
 }
