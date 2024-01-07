@@ -2,13 +2,10 @@
 <table>
   <thead>
     <tr>
-      <th>Monday</th>
-      <th>Tuesday</th>
-      <th>Wednesday</th>
-      <th>Thursday</th>
-      <th>Friday</th>
-      <th>Saturday</th>
-      <th>Sunday</th>
+      <th *ngFor="let day of DAYS_OF_WEEK">
+        {{ day | capitalizeFirst}}
+        <!-- add pipe to capitalize first letter -->
+      </th>
     </tr>
   </thead>
   <tbody>

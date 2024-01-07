@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
 import { MonthCalendarGrid } from './models/month-calendar-grid.model';
+import { CapitalizeFirstPipe } from './pipes/capitalize-first.pipe';
 import {
   getExactDate,
   getFirstWeekDayString,
@@ -8,20 +9,10 @@ import {
   getNumberOfDaysInMonth,
 } from './utils/date.utils';
 
-const DAYS_OF_WEEK = [
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-  'sunday',
-];
-
 @Component({
   selector: 'ngx-calendar-io',
   standalone: true, // TO DO: figure out what this means :)
-  imports: [CommonModule],
+  imports: [CommonModule, CapitalizeFirstPipe],
   templateUrl: './ngx-calendar-io.component.html',
   styleUrls: ['./ngx-calendar-io.component.css'],
 })
@@ -33,9 +24,19 @@ export class NgxCalendarIoComponent implements OnInit {
     return getMonthString(this.date, this.locale);
   }
 
+  protected readonly DAYS_OF_WEEK = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ];
+
   protected grid: MonthCalendarGrid[] = Array.from({ length: 5 }, () => {
     const week: MonthCalendarGrid = {};
-    DAYS_OF_WEEK.forEach((day) => {
+    this.DAYS_OF_WEEK.forEach((day) => {
       week[day] = {
         date: undefined,
         events: [],
