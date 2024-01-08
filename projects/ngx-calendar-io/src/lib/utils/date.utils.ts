@@ -27,3 +27,27 @@ export const getExactDate = (day: number, date: Date): Date => {
 
   return new Date(year, month, day);
 };
+
+export const addMonth = (date: Date): Date => {
+  const newDate = new Date(date);
+
+  newDate.setMonth(date.getMonth() + 1);
+
+  if (newDate.getMonth() !== (date.getMonth() + 1) % 12) {
+    newDate.setFullYear(date.getFullYear() + 1);
+  }
+
+  return newDate;
+};
+
+export const subtractMonth = (date: Date): Date => {
+  const newDate = new Date(date);
+
+  newDate.setMonth(date.getMonth() - 1);
+
+  if (newDate.getMonth() !== (date.getMonth() - 1 + 12) % 12) {
+    newDate.setFullYear(date.getFullYear() - 1);
+  }
+
+  return newDate;
+};
