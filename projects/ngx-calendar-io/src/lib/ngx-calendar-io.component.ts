@@ -3,11 +3,14 @@ import { Component, Input, OnInit } from '@angular/core';
 import { MonthCalendarGrid } from './models/month-calendar-grid.model';
 import { CapitalizeFirstPipe } from './pipes/capitalize-first.pipe';
 import {
+  addMonth,
   getExactDate,
   getFirstWeekDayString,
   getMonthString,
   getNumberOfDaysInMonth,
+  subtractMonth,
 } from './utils/date.utils';
+import { NgxCalendarIoService } from './ngx-calendar-io.service';
 
 @Component({
   selector: 'ngx-calendar-io',
@@ -17,61 +20,65 @@ import {
   styleUrls: ['./ngx-calendar-io.component.css'],
 })
 export class NgxCalendarIoComponent implements OnInit {
-  @Input() date: Date = new Date(2024, 1);
+  @Input() date: Date = new Date(2024, 0);
   @Input() locale: string = 'en';
+  protected grid: MonthCalendarGrid[] = [];
 
   protected get monthName(): string {
     return getMonthString(this.date, this.locale);
   }
 
-  protected readonly DAYS_OF_WEEK = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
+  protected get daysOfWeek(): string[] {
+    return this.calendarService.DAYS_OF_WEEK;
+  }
 
-  protected grid: MonthCalendarGrid[] = Array.from({ length: 5 }, () => {
-    const week: MonthCalendarGrid = {};
-    this.DAYS_OF_WEEK.forEach((day) => {
-      week[day] = {
-        date: undefined,
-        events: [],
-      };
-    });
-    return week;
-  });
+  constructor(private calendarService: NgxCalendarIoService) {}
 
   ngOnInit(): void {
+    this.grid = this.calendarService.createMonthGrid();
     this.setGridDates();
   }
 
   private setGridDates() {
     const firstWeekDay = getFirstWeekDayString(this.date, this.locale);
     const numberOfDaysMonth = getNumberOfDaysInMonth(this.date);
+    const totalNumberOfDaysPreviousMonth = getNumberOfDaysInMonth(
+      subtractMonth(this.date)
+    );
 
     let firstDayIsSet = false;
     let currentDayToSet = 1;
+    let currentDayToSetNextMonth = 1;
+    let numberOfDaysPrevMonthToFill = this.calculateDaysToFillPreviousMonth();
 
     for (let weekIndex = 0; weekIndex < this.grid.length; weekIndex++) {
       const currentWeek = this.grid[weekIndex];
 
       for (const [day, cell] of Object.entries(currentWeek)) {
-        if (currentDayToSet > numberOfDaysMonth) {
-          break;
+        if (numberOfDaysPrevMonthToFill > 0) {
+          cell.date = getExactDate(
+            totalNumberOfDaysPreviousMonth - (numberOfDaysPrevMonthToFill - 1),
+            subtractMonth(this.date)
+          );
+          numberOfDaysPrevMonthToFill--;
         }
 
-        const currentDateToSet = getExactDate(currentDayToSet, this.date);
-
-        if (firstDayIsSet || day === firstWeekDay.toLowerCase()) {
-          cell.date = currentDateToSet;
+        if (currentDayToSet > numberOfDaysMonth) {
+          cell.date = getExactDate(
+            currentDayToSetNextMonth,
+            addMonth(this.date)
+          );
+          currentDayToSetNextMonth++;
+        } else if (firstDayIsSet || day === firstWeekDay.toLowerCase()) {
+          cell.date = getExactDate(currentDayToSet, this.date);
           currentDayToSet++;
           firstDayIsSet = true;
         }
       }
     }
+  }
+
+  private calculateDaysToFillPreviousMonth(): number {
+    return new Date(this.date.getFullYear(), this.date.getMonth(), 1).getDay();
   }
 }
