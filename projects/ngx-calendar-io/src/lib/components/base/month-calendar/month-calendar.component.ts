@@ -1,28 +1,31 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { MonthCalendarGrid } from './models/month-calendar-grid.model';
-import { CapitalizeFirstPipe } from './pipes/capitalize-first.pipe';
+import { MonthCalendarGrid } from '../../../models';
+import { CapitalizeFirstPipe } from '../../../pipes/capitalize-first.pipe';
+import { NgxCalendarIoService } from '../../../services/ngx-calendar-io.service';
 import {
   addMonth,
   getExactDate,
+  getFirstWeekDayNumber,
   getFirstWeekDayString,
   getMonthString,
   getNumberOfDaysInMonth,
   subtractMonth,
-} from './utils/date.utils';
-import { NgxCalendarIoService } from './ngx-calendar-io.service';
+} from '../../../utils';
 
 @Component({
-  selector: 'ngx-calendar-io',
-  standalone: true, // TO DO: figure out what this means :)
+  selector: 'month-calendar',
+  standalone: true,
   imports: [CommonModule, CapitalizeFirstPipe],
-  templateUrl: './ngx-calendar-io.component.html',
-  styleUrls: ['./ngx-calendar-io.component.css'],
+  templateUrl: './month-calendar.component.html',
+  styleUrls: ['./month-calendar.component.css'],
 })
-export class NgxCalendarIoComponent implements OnInit {
-  @Input() date: Date = new Date(2024, 0);
-  @Input() locale: string = 'en';
+export class MonthCalendarComponent implements OnInit {
+  @Input() date: Date = new Date();
+  @Input() events: Event[] = [];
+  
   protected grid: MonthCalendarGrid[] = [];
+  private readonly locale: string = 'en';
 
   protected get monthName(): string {
     return getMonthString(this.date, this.locale);
@@ -49,7 +52,7 @@ export class NgxCalendarIoComponent implements OnInit {
     let firstDayIsSet = false;
     let currentDayToSet = 1;
     let currentDayToSetNextMonth = 1;
-    let numberOfDaysPrevMonthToFill = this.calculateDaysToFillPreviousMonth();
+    let numberOfDaysPrevMonthToFill = getFirstWeekDayNumber(this.date);
 
     for (let weekIndex = 0; weekIndex < this.grid.length; weekIndex++) {
       const currentWeek = this.grid[weekIndex];
@@ -76,9 +79,5 @@ export class NgxCalendarIoComponent implements OnInit {
         }
       }
     }
-  }
-
-  private calculateDaysToFillPreviousMonth(): number {
-    return new Date(this.date.getFullYear(), this.date.getMonth(), 1).getDay();
   }
 }
