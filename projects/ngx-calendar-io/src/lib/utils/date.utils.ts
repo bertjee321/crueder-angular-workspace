@@ -103,3 +103,28 @@ export const subtractMonth = (date: Date): Date => {
 
   return newDate;
 };
+
+/**
+ * Compares whether two dates represent the same day.
+ *
+ * @param dateOne - The first date to compare.
+ * @param dateTwo - The second date to compare.
+ * @returns `true` if the dates represent the same day, otherwise `false`.
+ */
+export const compareDatesAreSameDay = (
+  dateOne: Date,
+  dateTwo: Date
+): boolean => {
+  const dateOneTimeStamp = new Date(
+    dateOne.getFullYear(),
+    dateOne.getMonth(),
+    dateOne.getDate()
+  ).getTime();
+  const dateTwoTimeStamp = new Date(
+    dateTwo.getFullYear(),
+    dateTwo.getMonth(),
+    dateTwo.getDate()
+  ).getTime();
+
+  return dateOneTimeStamp === dateTwoTimeStamp;
+};

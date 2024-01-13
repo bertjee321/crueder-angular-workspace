@@ -1,11 +1,14 @@
-import { CalendarEventType } from "../enums";
+export interface CalendarEvents {
+  tasks: CalendarEvent[];
+  appointments: CalendarEvent[];
+}
 
-export interface Event {
+export interface CalendarEvent {
+  title: string;
+  date: Date;
+  allDay: boolean;
   startTime: Date;
   endTime: Date;
-  allDay: boolean;
-  type: CalendarEventType;
-  title: string;
   description?: string;
   persons?: string[];
 }

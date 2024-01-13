@@ -1,89 +1,74 @@
 <h4>{{ monthName }} {{ date.getFullYear() }}</h4>
 <div class="table-container">
-
-<table>
-  <thead>
-    <tr>
-      <th *ngFor="let day of daysOfWeek">
-        {{ day | capitalizeFirst}}
-        <!-- add pipe to capitalize first letter -->
-      </th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let week of grid">
-      <td>
-        <div class="weekday">
-          <div class="weekday__meta-data">
-            {{ week["sunday"].date?.getDate() }}
-          </div>
-          <div class="weekday__events"></div>
-        </div>
-      </td>
-      <td>
-        <div class="weekday">
-          <div class="weekday__meta-data">
-            {{ week["monday"].date?.getDate() }}
-          </div>
-          <div class="weekday__events">
-            <div *ngFor="let event of week['monday'].events">
-              {{ event.title }}
+  <table>
+    <thead>
+      <tr>
+        <th *ngFor="let day of daysOfWeek">
+          {{ day | capitalizeFirst }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let week of grid">
+        <td>
+          <div class="weekday">
+            <div class="weekday__meta-data">
+              {{ week["sunday"].date?.getDate() }}
             </div>
+            <div class="weekday__events"></div>
           </div>
-        </div>
-      </td>
-      <td>
-        <div class="weekday">
-          <div class="weekday__meta-data">
-            {{ week["tuesday"].date?.getDate() }}
-          </div>
-          <div class="weekday__events"></div>
-        </div>
-      </td>
-      <td>
-        <div class="weekday">
-          <div class="weekday__meta-data">
-            {{ week["wednesday"].date?.getDate() }}
-          </div>
-          <div class="weekday__events"></div>
-        </div>
-      </td>
-      <td>
-        <div class="weekday">
-          <div class="weekday__meta-data">
-            {{ week["thursday"].date?.getDate() }}
-          </div>
-          <div class="weekday__events">
-            <div *ngFor="let event of week['thursday'].events">
-              {{ event.title }}
+        </td>
+        <td>
+          <div class="weekday">
+            <div class="weekday__meta-data">
+              {{ week["monday"].date?.getDate() }}
             </div>
+            <div class="weekday__events"></div>
           </div>
-        </div>
-      </td>
-      <td>
-        <div class="weekday">
-          <div class="weekday__meta-data">
-            {{ week["friday"].date?.getDate() }}
-          </div>
-          <div class="weekday__events">
-            <div *ngFor="let event of week['friday'].events">
-              {{ event.title }}
+        </td>
+        <td>
+          <div class="weekday">
+            <div class="weekday__meta-data">
+              {{ week["tuesday"].date?.getDate() }}
             </div>
+            <div class="weekday__events"></div>
           </div>
-        </div>
-      </td>
-      <td>
-        <div class="weekday">
-          <div class="weekday__meta-data">
-            {{ week["saturday"].date?.getDate() }}
+        </td>
+        <td>
+          <div class="weekday">
+            <div class="weekday__meta-data">
+              {{ week["wednesday"].date?.getDate() }}
+            </div>
+            <div class="weekday__events"></div>
           </div>
-          <div class="weekday__events"></div>
-        </div>
-      </td>
-    </tr>
-  </tbody>
-</table>
+        </td>
+        <td>
+          <div class="weekday">
+            <div class="weekday__meta-data">
+              {{ week["thursday"].date?.getDate() }}
+            </div>
+            <div class="weekday__events"></div>
+          </div>
+        </td>
+        <td>
+          <div class="weekday">
+            <div class="weekday__meta-data">
+              {{ week["friday"].date?.getDate() }}
+            </div>
+            <div class="weekday__events"></div>
+          </div>
+        </td>
+        <td>
+          <div class="weekday">
+            <div class="weekday__meta-data">
+              {{ week["saturday"].date?.getDate() }}
+            </div>
+            <div class="weekday__events"></div>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
-
 
 <!-- <full-calendar [options]="calendarOptions"></full-calendar> -->

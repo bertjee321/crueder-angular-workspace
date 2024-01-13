@@ -1,30 +1,23 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit } from '@angular/core';
-import { MonthCalendarGrid } from '../../../models';
+import { testData } from '../../../models/test-data';
 import { CapitalizeFirstPipe } from '../../../pipes/capitalize-first.pipe';
 import { NgxCalendarIoService } from '../../../services/ngx-calendar-io.service';
-import {
-  addMonth,
-  getExactDate,
-  getFirstWeekDayNumber,
-  getFirstWeekDayString,
-  getMonthString,
-  getNumberOfDaysInMonth,
-  subtractMonth,
-} from '../../../utils';
+import { getMonthString } from '../../../utils';
+import { WeekdayComponent } from '../../shared/weekday/weekday.component';
+import { CalendarEvents, CalendarGrid } from '../../../models';
 
 @Component({
   selector: 'month-calendar',
   standalone: true,
-  imports: [CommonModule, CapitalizeFirstPipe],
+  imports: [CommonModule, CapitalizeFirstPipe, WeekdayComponent],
   templateUrl: './month-calendar.component.html',
   styleUrls: ['./month-calendar.component.css'],
 })
 export class MonthCalendarComponent implements OnInit {
   @Input() date: Date = new Date();
-  @Input() events: Event[] = [];
-  
-  protected grid: MonthCalendarGrid[] = [];
+  @Input() events: CalendarEvents = testData;
+  protected grid: CalendarGrid[] = [];
   private readonly locale: string = 'en';
 
   protected get monthName(): string {
@@ -38,46 +31,7 @@ export class MonthCalendarComponent implements OnInit {
   constructor(private calendarService: NgxCalendarIoService) {}
 
   ngOnInit(): void {
-    this.grid = this.calendarService.createMonthGrid();
-    this.setGridDates();
-  }
-
-  private setGridDates() {
-    const firstWeekDay = getFirstWeekDayString(this.date, this.locale);
-    const numberOfDaysMonth = getNumberOfDaysInMonth(this.date);
-    const totalNumberOfDaysPreviousMonth = getNumberOfDaysInMonth(
-      subtractMonth(this.date)
-    );
-
-    let firstDayIsSet = false;
-    let currentDayToSet = 1;
-    let currentDayToSetNextMonth = 1;
-    let numberOfDaysPrevMonthToFill = getFirstWeekDayNumber(this.date);
-
-    for (let weekIndex = 0; weekIndex < this.grid.length; weekIndex++) {
-      const currentWeek = this.grid[weekIndex];
-
-      for (const [day, cell] of Object.entries(currentWeek)) {
-        if (numberOfDaysPrevMonthToFill > 0) {
-          cell.date = getExactDate(
-            totalNumberOfDaysPreviousMonth - (numberOfDaysPrevMonthToFill - 1),
-            subtractMonth(this.date)
-          );
-          numberOfDaysPrevMonthToFill--;
-        }
-
-        if (currentDayToSet > numberOfDaysMonth) {
-          cell.date = getExactDate(
-            currentDayToSetNextMonth,
-            addMonth(this.date)
-          );
-          currentDayToSetNextMonth++;
-        } else if (firstDayIsSet || day === firstWeekDay.toLowerCase()) {
-          cell.date = getExactDate(currentDayToSet, this.date);
-          currentDayToSet++;
-          firstDayIsSet = true;
-        }
-      }
-    }
+    this.calendarService.initializeGrid(this.date, this.events, this.locale);
+    this.grid = this.calendarService.grid;
   }
 }
